@@ -8,9 +8,11 @@ import { Telemetry } from './pages/Telemetry'
 import { Ops } from './pages/Ops'
 import { Layout } from './components/Layout'
 import { useSupabaseAuth } from './hooks/useSupabaseAuth'
+import { useNotifications } from './hooks/useNotifications'
 
 function App() {
   const { isAuthenticated, loading } = useSupabaseAuth()
+  useNotifications() // Enable browser notifications
 
   if (loading) {
     return (

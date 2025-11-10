@@ -7,6 +7,7 @@ export function useSupabaseAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [userRole, setUserRole] = useState<'admin' | 'mod' | 'viewer' | undefined>(undefined)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -14,6 +15,9 @@ export function useSupabaseAuth() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
+      // Extract role from user metadata
+      const role = (session?.user?.user_metadata?.role || session?.user?.app_metadata?.role) as 'admin' | 'mod' | 'viewer' | undefined
+      setUserRole(role)
       setLoading(false)
       
       if (session?.access_token) {
@@ -27,6 +31,9 @@ export function useSupabaseAuth() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      // Extract role from user metadata
+      const role = (session?.user?.user_metadata?.role || session?.user?.app_metadata?.role) as 'admin' | 'mod' | 'viewer' | undefined
+      setUserRole(role)
       
       if (session?.access_token) {
         localStorage.setItem('supabase.auth.token', session.access_token)
@@ -61,6 +68,7 @@ export function useSupabaseAuth() {
     signIn,
     signOut,
     isAuthenticated: !!user,
+    userRole,
   }
 }
 

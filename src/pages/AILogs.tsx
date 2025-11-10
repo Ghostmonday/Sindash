@@ -1,14 +1,24 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { moderationApi, type AILog } from '@/api/moderation'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import { Card, CardContent } from '@/components/ui/Card'
 import { formatRelativeTime } from '@/lib/utils'
+import { useRealtime } from '@/hooks/useRealtime'
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
 
 export function AILogs() {
+  const queryClient = useQueryClient()
+  
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ['ai-logs'],
     queryFn: moderationApi.getAILogs,
+  })
+
+  // Real-time updates for AI logs
+  useRealtime<AILog>('ai_logs_realtime', 'moderation_flags', (newLog) => {
+    queryClient.setQueryData(['ai-logs'], (old: AILog[] = []) => {
+      return [newLog, ...(old || [])].slice(0, 100) // Keep latest 100
+    })
   })
 
   const getActionIcon = (action: string) => {

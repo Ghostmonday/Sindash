@@ -1,18 +1,35 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { telemetryApi } from '@/api/telemetry'
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { telemetryApi, type TelemetryTrend } from '@/api/telemetry'
 import { ChartCard } from '@/components/ChartCard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { useRealtime } from '@/hooks/useRealtime'
 
 type Timeframe = '1h' | '24h' | '7d' | '30d'
 
 export function Telemetry() {
   const [timeframe, setTimeframe] = useState<Timeframe>('24h')
+  const queryClient = useQueryClient()
 
   const { data: trends = [], isLoading } = useQuery({
     queryKey: ['telemetry', 'trends', timeframe],
     queryFn: () => telemetryApi.getTrends(timeframe),
+  })
+
+  // Real-time updates via Supabase Realtime
+  useRealtime<TelemetryTrend>('telemetry_trends', 'telemetry_trends', (newTrend) => {
+    queryClient.setQueryData(['telemetry', 'trends', timeframe], (old: TelemetryTrend[] = []) => {
+      const updated = [...old]
+      const existingIndex = updated.findIndex((t) => t.timestamp === newTrend.timestamp)
+      if (existingIndex >= 0) {
+        updated[existingIndex] = newTrend
+      } else {
+        updated.push(newTrend)
+        updated.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+      }
+      return updated.slice(-100) // Keep last 100 data points
+    })
   })
 
   const { data: summary } = useQuery({

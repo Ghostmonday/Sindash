@@ -4,6 +4,8 @@ import { moderationApi } from '@/api/moderation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ActionModal } from '@/components/ActionModal'
+import { RoleGuard } from '@/components/RoleGuard'
+import { ExportButton } from '@/components/ExportButton'
 import { Download, Trash2 } from 'lucide-react'
 
 export function Ops() {
@@ -60,8 +62,9 @@ export function Ops() {
   const activeMutes = mutes.filter((mute) => new Date(mute.muted_until) > new Date())
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Operations</h1>
+    <RoleGuard allowedRoles={['admin', 'mod']}>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Operations</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
@@ -92,14 +95,18 @@ export function Ops() {
               <Trash2 className="h-4 w-4 mr-2" />
               Clear Stale Mutes ({mutes.length - activeMutes.length})
             </Button>
-            <Button onClick={() => exportLogs('csv')} variant="outline" className="w-full">
-              <Download className="h-4 w-4 mr-2" />
-              Export Logs (CSV)
-            </Button>
-            <Button onClick={() => exportLogs('json')} variant="outline" className="w-full">
-              <Download className="h-4 w-4 mr-2" />
-              Export Logs (JSON)
-            </Button>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground mb-2">Export Reports:</p>
+              <ExportButton type="reports" variant="outline" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground mb-2">Export Mutes:</p>
+              <ExportButton type="mutes" variant="outline" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground mb-2">Export AI Logs:</p>
+              <ExportButton type="ai-logs" variant="outline" />
+            </div>
           </CardContent>
         </Card>
 
@@ -129,7 +136,8 @@ export function Ops() {
         actionType="ban"
         onSubmit={async (data) => banMutation.mutate(data)}
       />
-    </div>
+      </div>
+    </RoleGuard>
   )
 }
 

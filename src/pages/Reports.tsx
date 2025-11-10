@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { formatRelativeTime } from '@/lib/utils'
 import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
+import { AISummaryCard } from '@/components/AISummaryCard'
+import { ExportButton } from '@/components/ExportButton'
+import { RoleGuard } from '@/components/RoleGuard'
 
 export function Reports() {
   const [selectedSeverity, setSelectedSeverity] = useState<string>('all')
@@ -58,9 +61,14 @@ export function Reports() {
 
   return (
     <div className="space-y-6">
+      <AISummaryCard />
+      
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Reports</h1>
         <div className="flex gap-2">
+          <RoleGuard allowedRoles={['admin', 'mod']}>
+            <ExportButton type="reports" />
+          </RoleGuard>
           <select
             value={selectedSeverity}
             onChange={(e) => setSelectedSeverity(e.target.value)}

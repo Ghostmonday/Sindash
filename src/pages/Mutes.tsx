@@ -1,14 +1,31 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { moderationApi, type Mute } from '@/api/moderation'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import { Card, CardContent } from '@/components/ui/Card'
 import { formatRelativeTime, formatDate } from '@/lib/utils'
+import { useRealtime } from '@/hooks/useRealtime'
 import { Clock } from 'lucide-react'
 
 export function Mutes() {
+  const queryClient = useQueryClient()
+  
   const { data: mutes = [], isLoading } = useQuery({
     queryKey: ['mutes'],
     queryFn: moderationApi.getMutes,
+  })
+
+  // Real-time updates for mutes
+  useRealtime<Mute>('mutes_realtime', 'user_mutes', (newMute) => {
+    queryClient.setQueryData(['mutes'], (old: Mute[] = []) => {
+      const updated = [...old]
+      const existingIndex = updated.findIndex((m) => m.id === newMute.id)
+      if (existingIndex >= 0) {
+        updated[existingIndex] = newMute
+      } else {
+        updated.push(newMute)
+      }
+      return updated
+    })
   })
 
   const activeMutes = mutes.filter((mute) => new Date(mute.muted_until) > new Date())
