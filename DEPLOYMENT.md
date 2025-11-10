@@ -1,5 +1,10 @@
 # Sinapse Dashboard Deployment Guide
 
+## Deployment Options
+
+- **Vercel** (Recommended): See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
+- **Render**: See Render section below
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -22,6 +27,19 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Vercel Deployment (Recommended)
+
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for complete guide.
+
+**Quick Deploy**:
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+Or connect GitHub repo in Vercel dashboard for automatic deployments.
 
 ## Render Deployment
 

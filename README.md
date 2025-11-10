@@ -51,7 +51,29 @@ A real-time moderation and telemetry dashboard for the Sinapse platform, built w
    npm run build
    ```
 
-## Deployment (Render)
+## Deployment
+
+### Vercel (Recommended)
+
+1. **Install Vercel CLI**:
+   ```bash
+   npm i -g vercel
+   vercel login
+   ```
+
+2. **Deploy**:
+   ```bash
+   vercel --prod
+   ```
+
+3. **Or use GitHub Integration**:
+   - Import `Ghostmonday/Sindash` in Vercel dashboard
+   - Add environment variables
+   - Deploy automatically on push
+
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for details.
+
+### Render (Alternative)
 
 1. Create a new **Static Site** in Render
 2. Connect your GitHub repository
